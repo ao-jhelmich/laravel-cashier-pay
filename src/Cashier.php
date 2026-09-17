@@ -2,4 +2,9 @@
 
 namespace Paynl\LaravelCashier;
 
-class Cashier {}
+use Paynl\LaravelCashier\Models\Subscription;
+
+class Cashier
+{
+    public static $subscriptionModel = Subscription::class;
+}
