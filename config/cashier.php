@@ -1,6 +1,24 @@
 <?php
 
-// config for Paynl/LaravelCashier
+use PayNL\Sdk\Config\Config;
+
 return [
-    'PAY_KEY' => env('PAY_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pay. API bearer token
+    |--------------------------------------------------------------------------
+    */
+
+    'token' => env('PAYNL_TOKEN'),
+    'service_id' => env('PAYNL_SERVICE_ID'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pay. API base URL
+    |--------------------------------------------------------------------------
+    */
+
+    'core' => env('PAYNL_API_CORE', Config::TGU1),
+
 ];

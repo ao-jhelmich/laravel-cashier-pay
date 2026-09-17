@@ -1,68 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
-use Illuminate\Database\Eloquent\Model;
 use Paynl\LaravelCashier\Facades\Pay;
-use Paynl\LaravelCashier\Pay as PayManager;
-use Paynl\LaravelCashier\Subscription\PendingSubscription;
-use Paynl\LaravelCashier\Subscription\Subscription;
-use Paynl\LaravelCashier\Subscription\SubscriptionStatus;
+use Paynl\LaravelCashier\Pay as PayService;
 
 it('resolves the pay facade root', function () {
-    expect(Pay::getFacadeRoot())->toBeInstanceOf(PayManager::class);
+    expect(Pay::getFacadeRoot())->toBeInstanceOf(PayService::class);
 });
 
-it('starts a new subscription via the facade', function () {
-    $billable = new class extends Model
-    {
-        protected $table = 'users';
+it('throws when service id is not configured', function () {
+    config(['cashier.service_id' => null]);
 
-        public $incrementing = false;
+    Pay::orderCreate('https://shop.test/return', 'https://shop.test/exchange');
+})->throws(InvalidArgumentException::class, 'Pay service ID is not configured');
 
-        protected $keyType = 'string';
+it('sets return and exchange urls on order create', function () {
+    config(['cashier.service_id' => 'SL-1234-5678']);
 
-        protected $guarded = [];
-    };
+    $body = Pay::orderCreate(
+        returnUrl: 'https://shop.test/checkout/done',
+        exchangeUrl: 'https://shop.test/webhooks/pay',
+    )
+        ->setAmount(250)
+        ->getBodyParameters();
 
-    $billable->forceFill(['id' => 'user-1']);
-
-    $pending = Pay::newSubscription($billable, 'default', 'premium');
-
-    expect($pending)->toBeInstanceOf(PendingSubscription::class);
-
-    $subscription = $pending->create();
-
-    expect($subscription)
-        ->toBeInstanceOf(Subscription::class)
-        ->status->toBe(SubscriptionStatus::Active)
-        ->type->toBe('default')
-        ->plan->toBe('premium')
-        ->billableId->toBe('user-1');
-});
-
-it('prolongs a subscription via the facade', function () {
-    $subscription = new Subscription(
-        id: 'sub-1',
-        billableType: 'user',
-        billableId: 1,
-        type: 'default',
-        plan: 'premium',
-    );
-
-    expect(Pay::prolongSubscription($subscription))->toBe($subscription);
-});
-
-it('cancels a subscription via the facade', function () {
-    $subscription = new Subscription(
-        id: 'sub-1',
-        billableType: 'user',
-        billableId: 1,
-        type: 'default',
-        plan: 'premium',
-    );
-
-    Pay::cancelSubscription($subscription);
-
-    expect(true)->toBeTrue();
+    expect($body['returnUrl'])->toBe('https://shop.test/checkout/done')
+        ->and($body['exchangeUrl'])->toBe('https://shop.test/webhooks/pay')
+        ->and($body['serviceId'])->toBe('SL-1234-5678');
 });
