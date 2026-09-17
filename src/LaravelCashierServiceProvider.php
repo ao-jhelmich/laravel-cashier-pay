@@ -33,6 +33,6 @@ class LaravelCashierServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        Route::post('/webhook', WebhookController::class)->name('cashier.webhook');
+        Route::post('/pay/webhook', WebhookController::class)->name('cashier.webhook');
     }
 }
