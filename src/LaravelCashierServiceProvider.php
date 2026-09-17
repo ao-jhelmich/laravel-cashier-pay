@@ -23,7 +23,7 @@ class LaravelCashierServiceProvider extends PackageServiceProvider
             ->name('laravel-cashier')
             ->hasConfigFile('cashier')
             ->hasViews()
-            ->hasMigration('create_laravel_cashier_table')
+            ->hasMigration('create_subscriptions_table')
             ->hasCommands(CashierInstall::class, CashierRun::class);
     }
 
