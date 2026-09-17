@@ -6,5 +6,10 @@ use Paynl\LaravelCashier\Models\Subscription;
 
 class LaravelCashier
 {
-    public static $subscriptionModel = Subscription::class;
+    private static $subscriptionModel = Subscription::class;
+
+    public static function subscriptionModel(): string
+    {
+        return self::$subscriptionModel;
+    }
 }
