@@ -2,4 +2,12 @@
 
 namespace Paynl\LaravelCashier\Concerns;
 
-trait ManagesSubscriptions {}
+use Paynl\LaravelCashier\LaravelCashier;
+
+trait ManagesSubscriptions
+{
+    public function subscriptions()
+    {
+        return $this->morphMany(LaravelCashier::$subscriptionModel, 'owner');
+    }
+}

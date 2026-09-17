@@ -2,4 +2,4 @@
 
 namespace Paynl\LaravelCashier;
 
-class LaravelCashier {}
+class Cashier {}
