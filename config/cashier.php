@@ -6,18 +6,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Pay. API bearer token
+    | Pay. API credentials (HTTP Basic)
     |--------------------------------------------------------------------------
+    |
+    | Order:Create on connect.pay.nl uses Basic authentication:
+    | - Merchant: AT-code (username) + API token 40 chars (password), or
+    | - Sales location: SL-code (username) + service secret (password).
+    |
+    | When api_token_code is set, AT + token is used. Otherwise SL + token.
+    |
     */
+
+    'api_token_code' => env('PAYNL_API_TOKEN_CODE'),
 
     'token' => env('PAYNL_TOKEN'),
-    'service_id' => env('PAYNL_SERVICE_ID'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pay. API base URL
-    |--------------------------------------------------------------------------
-    */
+    'service_id' => env('PAYNL_SERVICE_ID'),
 
     'core' => env('PAYNL_API_CORE', Config::TGU1),
 

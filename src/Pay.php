@@ -2,7 +2,6 @@
 
 namespace Paynl\LaravelCashier;
 
-use Paynl\LaravelCashier\AuthAdapter\Bearer;
 use PayNL\Sdk\Config\Config;
 use PayNL\Sdk\Model\Request\OrderCreateRequest;
 use PayNL\Sdk\Request\RequestData;
@@ -52,22 +51,9 @@ class Pay
     protected function makeConfig(): Config
     {
         $settings = config('cashier', []);
-        $token = (string) ($settings['token'] ?? '');
 
         $config = new Config([
-            'authentication' => [
-                'type' => 'Bearer',
-                'username' => '-',
-                'password' => $token,
-            ],
-            'authAdapters' => [
-                'aliases' => [
-                    'Bearer' => 'bearer',
-                ],
-                'invokables' => [
-                    'bearer' => Bearer::class,
-                ],
-            ],
+            'authentication' => $this->authenticationSettings($settings),
         ]);
 
         if (! empty($settings['core'])) {
@@ -75,5 +61,39 @@ class Pay
         }
 
         return $config;
+    }
+
+    /**
+     * @param  array<string, mixed>  $settings
+     * @return array{type: string, username: string, password: string}
+     */
+    protected function authenticationSettings(array $settings): array
+    {
+        $password = (string) ($settings['token'] ?? '');
+        if ($password === '') {
+            throw new \InvalidArgumentException('Pay API token is not configured (cashier.token / PAYNL_TOKEN).');
+        }
+
+        $tokenCode = (string) ($settings['api_token_code'] ?? '');
+        if ($tokenCode !== '') {
+            return [
+                'type' => 'Basic',
+                'username' => $tokenCode,
+                'password' => $password,
+            ];
+        }
+
+        $serviceId = (string) ($settings['service_id'] ?? '');
+        if ($serviceId === '') {
+            throw new \InvalidArgumentException(
+                'Pay API authentication is not configured. Set PAYNL_API_TOKEN_CODE (AT-code) or PAYNL_SERVICE_ID with PAYNL_TOKEN as service secret.',
+            );
+        }
+
+        return [
+            'type' => 'Basic',
+            'username' => $serviceId,
+            'password' => $password,
+        ];
     }
 }

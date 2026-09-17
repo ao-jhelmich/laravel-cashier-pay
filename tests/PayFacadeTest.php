@@ -13,8 +13,40 @@ it('throws when service id is not configured', function () {
     Pay::orderCreate('https://shop.test/return', 'https://shop.test/exchange');
 })->throws(InvalidArgumentException::class, 'Pay service ID is not configured');
 
+it('builds basic auth from api token code when configured', function () {
+    config([
+        'cashier.api_token_code' => 'AT-1234-5678',
+        'cashier.token' => 'api-token-secret',
+        'cashier.service_id' => 'SL-1234-5678',
+    ]);
+
+    $pay = new PayService;
+    $auth = $pay->config()->get('authentication');
+
+    expect($auth->get('type'))->toBe('Basic')
+        ->and($auth->get('username'))->toBe('AT-1234-5678')
+        ->and($auth->get('password'))->toBe('api-token-secret');
+});
+
+it('builds basic auth from service id when api token code is omitted', function () {
+    config([
+        'cashier.api_token_code' => null,
+        'cashier.token' => 'service-secret',
+        'cashier.service_id' => 'SL-9999-8888',
+    ]);
+
+    $pay = new PayService;
+    $auth = $pay->config()->get('authentication');
+
+    expect($auth->get('username'))->toBe('SL-9999-8888')
+        ->and($auth->get('password'))->toBe('service-secret');
+});
+
 it('sets return and exchange urls on order create', function () {
-    config(['cashier.service_id' => 'SL-1234-5678']);
+    config([
+        'cashier.token' => 'secret',
+        'cashier.service_id' => 'SL-1234-5678',
+    ]);
 
     $body = Pay::orderCreate(
         returnUrl: 'https://shop.test/checkout/done',
