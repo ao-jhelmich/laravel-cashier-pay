@@ -2,7 +2,7 @@
 
 namespace Paynl\LaravelCashier\Concerns;
 
-use Paynl\LaravelCashier\Cashier;
+use Paynl\LaravelCashier\Facades\Cashier;
 
 trait ManagesSubscriptions
 {
