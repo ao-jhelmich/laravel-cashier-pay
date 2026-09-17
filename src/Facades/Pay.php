@@ -12,7 +12,7 @@ use PayNL\Sdk\Request\RequestData;
  * @method static Config config()
  * @method static PayService setConfig(Config $config)
  * @method static mixed request(RequestData $request)
- * @method static OrderCreateRequest orderCreate(?string $returnUrl = null, ?string $exchangeUrl = null)
+ * @method static OrderCreateRequest orderCreate(string $returnUrl, string $exchangeUrl)
  *
  * @see PayService
  */
