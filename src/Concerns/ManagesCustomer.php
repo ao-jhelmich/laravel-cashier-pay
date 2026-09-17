@@ -28,6 +28,6 @@ trait ManagesCustomer
             return null;
         }
 
-        return strtolower(class_basename($this)).$this->getKey();
+        return strtolower(class_basename($this)).'-'.$this->getKey();
     }
 }
