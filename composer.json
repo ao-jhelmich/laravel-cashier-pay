@@ -83,7 +83,8 @@
                 "Paynl\\LaravelCashier\\LaravelCashierServiceProvider"
             ],
             "aliases": {
-                "LaravelCashier": "Paynl\\LaravelCashier\\Facades\\LaravelCashier"
+                "LaravelCashier": "Paynl\\LaravelCashier\\Facades\\LaravelCashier",
+                "Pay": "Paynl\\LaravelCashier\\Facades\\Pay"
             }
         }
     },

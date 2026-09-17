@@ -8,6 +8,12 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelCashierServiceProvider extends PackageServiceProvider
 {
+    public function packageRegistered(): void
+    {
+        $this->app->singleton(Pay::class);
+        $this->app->singleton(Subscription\SubscriptionManager::class);
+    }
+
     public function configurePackage(Package $package): void
     {
         /*
