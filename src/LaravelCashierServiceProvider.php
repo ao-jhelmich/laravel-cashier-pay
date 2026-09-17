@@ -3,7 +3,8 @@
 namespace Paynl\LaravelCashier;
 
 use Illuminate\Support\Facades\Route;
-use Paynl\LaravelCashier\Commands\LaravelCashierCommand;
+use Paynl\LaravelCashier\Commands\CashierInstall;
+use Paynl\LaravelCashier\Commands\CashierRun;
 use Paynl\LaravelCashier\Http\Controllers\WebhookController;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -23,7 +24,7 @@ class LaravelCashierServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_laravel_cashier_table')
-            ->hasCommand(LaravelCashierCommand::class);
+            ->hasCommands(CashierInstall::class, CashierRun::class);
     }
 
     public function packageBooted(): void
