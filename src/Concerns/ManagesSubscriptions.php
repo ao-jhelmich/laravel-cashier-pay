@@ -16,7 +16,7 @@ trait ManagesSubscriptions
 
     public function subscribed(string $plan): bool
     {
-        return $this->subscriptions()->where('name', $plan)->exists();
+        return $this->subscriptions()->where('plan', $plan)->exists();
     }
 
     public function newSubscription(string $plan): Checkout
