@@ -6,16 +6,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Pay. API credentials (HTTP Basic)
+    | Pay. API credentials
     |--------------------------------------------------------------------------
     |
-    | Order:Create on connect.pay.nl uses Basic authentication:
-    | - Merchant: AT-code (username) + API token 40 chars (password), or
-    | - Sales location: SL-code (username) + service secret (password).
+    | auth_scheme "bearer" (default): Authorization: Bearer {PAYNL_TOKEN}
     |
-    | When api_token_code is set, AT + token is used. Otherwise SL + token.
+    | auth_scheme "basic": HTTP Basic for connect.pay.nl
+    | - Merchant: PAYNL_API_TOKEN_CODE (AT) + PAYNL_TOKEN (API token), or
+    | - Sales location: PAYNL_SERVICE_ID (SL) + PAYNL_TOKEN (service secret)
     |
     */
+
+    'auth_scheme' => env('PAYNL_AUTH_SCHEME', 'bearer'),
 
     'api_token_code' => env('PAYNL_API_TOKEN_CODE'),
 
@@ -26,9 +28,9 @@ return [
     'core' => env('PAYNL_API_CORE', Config::TGU1),
 
     // https://merchant.example/return?id=99006002008X42f3&reference=&statusAction=PAID&statusCode=100&ticket=
-    'return_url' => env('CASHIER_RETURN_URL', ENV('APP_URL').'/dashboard'),
+    'return_url' => env('CASHIER_RETURN_URL', env('APP_URL').'/dashboard'),
 
-    'exchange_url' => env('CASHIER_EXCHANGE_URL', ENV('APP_URL').'/pay/webhook'),
+    'exchange_url' => env('CASHIER_EXCHANGE_URL', env('APP_URL').'/pay/webhook'),
     /*
     |--------------------------------------------------------------------------
     | Pay. Plans

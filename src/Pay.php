@@ -2,6 +2,7 @@
 
 namespace Paynl\LaravelCashier;
 
+use Paynl\LaravelCashier\AuthAdapter\Bearer;
 use Paynl\LaravelCashier\ValueObjects\Checkout;
 use PayNL\Sdk\Config\Config;
 use PayNL\Sdk\Model\Request\OrderCreateRequest;
@@ -52,9 +53,24 @@ class Pay
     {
         $settings = config('cashier', []);
 
-        $config = new Config([
-            'authentication' => $this->authenticationSettings($settings),
-        ]);
+        $authentication = $this->authenticationSettings($settings);
+
+        $configData = [
+            'authentication' => $authentication,
+        ];
+
+        if ($authentication['type'] === 'Bearer') {
+            $configData['authAdapters'] = [
+                'aliases' => [
+                    'Bearer' => 'bearer',
+                ],
+                'invokables' => [
+                    'bearer' => Bearer::class,
+                ],
+            ];
+        }
+
+        $config = new Config($configData);
 
         if (! empty($settings['core'])) {
             $config->setCore((string) $settings['core']);
@@ -69,31 +85,54 @@ class Pay
      */
     protected function authenticationSettings(array $settings): array
     {
-        $password = (string) ($settings['token'] ?? '');
-        if ($password === '') {
+        $token = (string) ($settings['token'] ?? '');
+        if ($token === '') {
             throw new \InvalidArgumentException('Pay API token is not configured (cashier.token / PAYNL_TOKEN).');
         }
 
+        $scheme = strtolower((string) ($settings['auth_scheme'] ?? 'bearer'));
+
+        if ($scheme === 'basic') {
+            return $this->basicAuthenticationSettings($settings, $token);
+        }
+
+        if ($scheme !== 'bearer') {
+            throw new \InvalidArgumentException('Invalid cashier.auth_scheme. Use "bearer" or "basic".');
+        }
+
+        return [
+            'type' => 'Bearer',
+            'username' => '-',
+            'password' => $token,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $settings
+     * @return array{type: string, username: string, password: string}
+     */
+    protected function basicAuthenticationSettings(array $settings, string $token): array
+    {
         $tokenCode = (string) ($settings['api_token_code'] ?? '');
         if ($tokenCode !== '') {
             return [
                 'type' => 'Basic',
                 'username' => $tokenCode,
-                'password' => $password,
+                'password' => $token,
             ];
         }
 
         $serviceId = (string) ($settings['service_id'] ?? '');
         if ($serviceId === '') {
             throw new \InvalidArgumentException(
-                'Pay API authentication is not configured. Set PAYNL_API_TOKEN_CODE (AT-code) or PAYNL_SERVICE_ID with PAYNL_TOKEN as service secret.',
+                'Basic auth requires PAYNL_API_TOKEN_CODE (AT-code) or PAYNL_SERVICE_ID with PAYNL_TOKEN as service secret.',
             );
         }
 
         return [
             'type' => 'Basic',
             'username' => $serviceId,
-            'password' => $password,
+            'password' => $token,
         ];
     }
 

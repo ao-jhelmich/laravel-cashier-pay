@@ -13,8 +13,19 @@ it('throws when service id is not configured', function () {
     Pay::orderCreate('https://shop.test/return', 'https://shop.test/exchange');
 })->throws(InvalidArgumentException::class, 'Pay service ID is not configured');
 
+it('uses bearer auth by default', function () {
+    config(['cashier.token' => 'bearer-token']);
+
+    $pay = new PayService;
+    $auth = $pay->config()->get('authentication');
+
+    expect($auth->get('type'))->toBe('Bearer')
+        ->and($auth->get('password'))->toBe('bearer-token');
+});
+
 it('builds basic auth from api token code when configured', function () {
     config([
+        'cashier.auth_scheme' => 'basic',
         'cashier.api_token_code' => 'AT-1234-5678',
         'cashier.token' => 'api-token-secret',
         'cashier.service_id' => 'SL-1234-5678',
@@ -30,6 +41,7 @@ it('builds basic auth from api token code when configured', function () {
 
 it('builds basic auth from service id when api token code is omitted', function () {
     config([
+        'cashier.auth_scheme' => 'basic',
         'cashier.api_token_code' => null,
         'cashier.token' => 'service-secret',
         'cashier.service_id' => 'SL-9999-8888',
