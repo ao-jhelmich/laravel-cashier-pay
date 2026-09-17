@@ -1,68 +1,42 @@
 <?php
 
-declare(strict_types=1);
-
-use Illuminate\Database\Eloquent\Model;
 use Paynl\LaravelCashier\Facades\Pay;
-use Paynl\LaravelCashier\Pay as PayManager;
-use Paynl\LaravelCashier\Subscription\PendingSubscription;
-use Paynl\LaravelCashier\Subscription\Subscription;
-use Paynl\LaravelCashier\Subscription\SubscriptionStatus;
+use Paynl\LaravelCashier\Pay as PayService;
 
 it('resolves the pay facade root', function () {
-    expect(Pay::getFacadeRoot())->toBeInstanceOf(PayManager::class);
+    expect(Pay::getFacadeRoot())->toBeInstanceOf(PayService::class);
 });
 
-it('starts a new subscription via the facade', function () {
-    $billable = new class extends Model
-    {
-        protected $table = 'users';
+it('applies return and exchange urls from config on order create', function () {
+    config([
+        'cashier.service_id' => 'SL-1234-5678',
+        'cashier.return_url' => 'https://shop.test/return',
+        'cashier.exchange_url' => 'https://shop.test/exchange',
+    ]);
 
-        public $incrementing = false;
+    $body = Pay::orderCreate()
+        ->setAmount(100)
+        ->getBodyParameters();
 
-        protected $keyType = 'string';
-
-        protected $guarded = [];
-    };
-
-    $billable->forceFill(['id' => 'user-1']);
-
-    $pending = Pay::newSubscription($billable, 'default', 'premium');
-
-    expect($pending)->toBeInstanceOf(PendingSubscription::class);
-
-    $subscription = $pending->create();
-
-    expect($subscription)
-        ->toBeInstanceOf(Subscription::class)
-        ->status->toBe(SubscriptionStatus::Active)
-        ->type->toBe('default')
-        ->plan->toBe('premium')
-        ->billableId->toBe('user-1');
+    expect($body['returnUrl'])->toBe('https://shop.test/return')
+        ->and($body['exchangeUrl'])->toBe('https://shop.test/exchange')
+        ->and($body['serviceId'])->toBe('SL-1234-5678');
 });
 
-it('prolongs a subscription via the facade', function () {
-    $subscription = new Subscription(
-        id: 'sub-1',
-        billableType: 'user',
-        billableId: 1,
-        type: 'default',
-        plan: 'premium',
-    );
+it('allows overriding return and exchange urls per order create', function () {
+    config([
+        'cashier.return_url' => 'https://shop.test/default-return',
+        'cashier.exchange_url' => 'https://shop.test/default-exchange',
+    ]);
 
-    expect(Pay::prolongSubscription($subscription))->toBe($subscription);
-});
+    $body = Pay::orderCreate(
+        returnUrl: 'https://shop.test/checkout/done',
+        exchangeUrl: 'https://shop.test/webhooks/pay',
+    )
+        ->setServiceId('SL-9999-8888')
+        ->setAmount(250)
+        ->getBodyParameters();
 
-it('cancels a subscription via the facade', function () {
-    $subscription = new Subscription(
-        id: 'sub-1',
-        billableType: 'user',
-        billableId: 1,
-        type: 'default',
-        plan: 'premium',
-    );
-
-    Pay::cancelSubscription($subscription);
-
-    expect(true)->toBeTrue();
+    expect($body['returnUrl'])->toBe('https://shop.test/checkout/done')
+        ->and($body['exchangeUrl'])->toBe('https://shop.test/webhooks/pay');
 });

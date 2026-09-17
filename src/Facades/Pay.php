@@ -1,26 +1,25 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Paynl\LaravelCashier\Facades;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
-use Paynl\LaravelCashier\Pay as PayManager;
-use Paynl\LaravelCashier\Subscription\Subscription;
-use Paynl\LaravelCashier\ValueObjects\Checkout;
+use Paynl\LaravelCashier\Pay as PayService;
+use PayNL\Sdk\Config\Config;
+use PayNL\Sdk\Model\Request\OrderCreateRequest;
+use PayNL\Sdk\Request\RequestData;
 
 /**
- * @method static Checkout newSubscription(Model $billable, string $type, string $plan)
- * @method static Subscription prolongSubscription(Subscription $subscription)
- * @method static void cancelSubscription(Subscription $subscription)
+ * @method static Config config()
+ * @method static PayService setConfig(Config $config)
+ * @method static mixed request(RequestData $request)
+ * @method static OrderCreateRequest orderCreate(?string $returnUrl = null, ?string $exchangeUrl = null)
  *
- * @see PayManager
+ * @see PayService
  */
 class Pay extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return PayManager::class;
+        return PayService::class;
     }
 }
