@@ -2,4 +2,7 @@
 
 namespace Paynl\LaravelCashier\Concerns;
 
-trait ManagesCustomer {}
+trait ManagesCustomer
+{
+
+}
