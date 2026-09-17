@@ -10,7 +10,7 @@ class Checkout
         public string $redirectUrl,
     ) {}
 
-    public function redirectUrl(): RedirectResponse
+    public function redirect(): RedirectResponse
     {
         return redirect()->away($this->redirectUrl);
     }
