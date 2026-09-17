@@ -30,8 +30,7 @@ trait ManagesSubscriptions
         $checkout = Pay::newSubscription($plan);
 
         $this->subscriptions()->create([
-            'name' => $plan,
-            'price' => $planConfig['price'] ?? null,
+            'plan' => $plan,
         ]);
 
         return $checkout;
