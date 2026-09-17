@@ -5,10 +5,9 @@ declare(strict_types=1);
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Paynl\LaravelCashier\Facades\Pay;
 use Paynl\LaravelCashier\Models\Subscription;
-use Paynl\LaravelCashier\Subscription\PendingSubscription;
-use Paynl\LaravelCashier\Subscription\Subscription as DomainSubscription;
-use Paynl\LaravelCashier\Subscription\SubscriptionStatus;
+use Paynl\LaravelCashier\ValueObjects\Checkout;
 use Workbench\App\Models\User;
 
 beforeEach(function () {
@@ -78,20 +77,16 @@ it('does not treat another billable subscription as its own', function () {
     expect($owner->subscribed('premium'))->toBeFalse();
 });
 
-it('starts a pending default-type subscription for the plan', function () {
+it('starts a checkout and stores a subscription for the plan', function () {
+    Pay::shouldReceive('newSubscription')
+        ->once()
+        ->with('basic')
+        ->andReturn(new Checkout(redirectUrl: 'https://pay.test/redirect'));
+
     $user = billableUser();
+    $checkout = $user->newSubscription('basic');
 
-    $pending = $user->newSubscription('premium');
-
-    expect($pending)->toBeInstanceOf(PendingSubscription::class);
-
-    $subscription = $pending->create();
-
-    expect($subscription)
-        ->toBeInstanceOf(DomainSubscription::class)
-        ->status->toBe(SubscriptionStatus::Active)
-        ->type->toBe('default')
-        ->plan->toBe('premium')
-        ->billableId->toBe($user->getKey())
-        ->billableType->toBe($user->getMorphClass());
+    expect($checkout)->toBeInstanceOf(Checkout::class)
+        ->and($checkout->redirectUrl)->toBe('https://pay.test/redirect')
+        ->and($user->subscribed('basic'))->toBeTrue();
 });

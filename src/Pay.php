@@ -32,8 +32,18 @@ class Pay
         return $request->setConfig($this->config())->start();
     }
 
-    public function orderCreate(): OrderCreateRequest
+    public function orderCreate(string $returnUrl, string $exchangeUrl): OrderCreateRequest
     {
+        $request = new OrderCreateRequest;
+
+        $serviceId = config('cashier.service_id');
+        if (blank($serviceId)) {
+            throw new \InvalidArgumentException('Pay service ID is not configured (cashier.service_id).');
+        }
+
+        $request->setServiceId((string) $serviceId);
+        $request->setReturnurl($returnUrl);
+        $request->setExchangeUrl($exchangeUrl);
 
         return $request;
     }

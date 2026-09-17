@@ -88,7 +88,7 @@ it('builds a pay reference from the class basename and id', function () {
     $user = new User;
     $user->id = 42;
 
-    expect($user->payReference())->toBe('user42');
+    expect($user->payReference())->toBe('user-42');
 });
 
 it('returns null when the model has no id', function () {
