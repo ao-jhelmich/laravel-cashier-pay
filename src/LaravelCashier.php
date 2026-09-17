@@ -10,6 +10,11 @@ class LaravelCashier
     /** @var class-string<Subscription> */
     public static string $subscriptionModel = Subscription::class;
 
+    public static function subscriptionModel(): string
+    {
+        return self::$subscriptionModel;
+    }
+
     public static function useSubscriptionModel(string $model): void
     {
         static::$subscriptionModel = $model;
@@ -26,10 +31,4 @@ class LaravelCashier
     }
 
     public function cancelSubscription(Subscription $subscription): void {}
-    private static $subscriptionModel = Subscription::class;
-
-    public static function subscriptionModel(): string
-    {
-        return self::$subscriptionModel;
-    }
 }

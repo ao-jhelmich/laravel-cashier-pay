@@ -1,6 +1,6 @@
 <?php
 
-namespace Workbench\App\Console;
+namespace Paynl\LaravelCashier\Commands;
 
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
