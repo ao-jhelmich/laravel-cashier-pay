@@ -21,6 +21,12 @@ trait ManagesSubscriptions
 
     public function newSubscription(string $plan): Checkout
     {
-        return Pay::newSubscription($this, 'default', $plan);
+        $checkout = Pay::newSubscription($this, 'default', $plan);
+
+        $this->subscriptions()->create([
+            'plan' => $plan,
+        ]);
+
+        return $checkout;
     }
 }
