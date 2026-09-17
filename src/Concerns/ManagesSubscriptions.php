@@ -5,7 +5,7 @@ namespace Paynl\LaravelCashier\Concerns;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Paynl\LaravelCashier\Facades\Cashier;
 use Paynl\LaravelCashier\Facades\Pay;
-use Paynl\LaravelCashier\Subscription\PendingSubscription;
+use Paynl\LaravelCashier\ValueObjects\Checkout;
 
 trait ManagesSubscriptions
 {
@@ -19,7 +19,7 @@ trait ManagesSubscriptions
         return $this->subscriptions()->where('name', $plan)->exists();
     }
 
-    public function newSubscription(string $plan): PendingSubscription
+    public function newSubscription(string $plan): Checkout
     {
         return Pay::newSubscription($this, 'default', $plan);
     }

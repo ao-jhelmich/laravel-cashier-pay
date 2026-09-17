@@ -7,11 +7,11 @@ namespace Paynl\LaravelCashier\Facades;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
 use Paynl\LaravelCashier\Pay as PayManager;
-use Paynl\LaravelCashier\Subscription\PendingSubscription;
 use Paynl\LaravelCashier\Subscription\Subscription;
+use Paynl\LaravelCashier\ValueObjects\Checkout;
 
 /**
- * @method static PendingSubscription newSubscription(Model $billable, string $type, string $plan)
+ * @method static Checkout newSubscription(Model $billable, string $type, string $plan)
  * @method static Subscription prolongSubscription(Subscription $subscription)
  * @method static void cancelSubscription(Subscription $subscription)
  *
