@@ -16,4 +16,18 @@ trait ManagesCustomer
     {
         return $this->email ?? null;
     }
+
+    public function payPhone(): ?string
+    {
+        return $this->phone ?? null;
+    }
+
+    public function payReference(): ?string
+    {
+        if ($this->getKey() === null) {
+            return null;
+        }
+
+        return strtolower(class_basename($this)).$this->getKey();
+    }
 }
