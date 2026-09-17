@@ -2,9 +2,9 @@
 
 namespace Paynl\LaravelCashier;
 
+use Paynl\LaravelCashier\Commands\LaravelCashierCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Paynl\LaravelCashier\Commands\LaravelCashierCommand;
 
 class LaravelCashierServiceProvider extends PackageServiceProvider
 {
