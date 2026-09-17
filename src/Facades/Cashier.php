@@ -3,14 +3,15 @@
 namespace Paynl\LaravelCashier\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Paynl\LaravelCashier\LaravelCashier;
 
 /**
- * @see \Paynl\LaravelCashier\LaravelCashier
+ * @see LaravelCashier
  */
-class LaravelCashier extends Facade
+class Cashier extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Paynl\LaravelCashier\LaravelCashier::class;
+        return LaravelCashier::class;
     }
 }
