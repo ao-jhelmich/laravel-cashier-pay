@@ -25,6 +25,9 @@ return [
 
     'core' => env('PAYNL_API_CORE', Config::TGU1),
 
+    'return_url' => env('CASHIER_RETURN_URL', ENV('APP_URL').'/dashboard'),
+
+    'exchange_url' => env('CASHIER_EXCHANGE_URL', ENV('APP_URL').'/pay/webhook'),
     /*
     |--------------------------------------------------------------------------
     | Pay. Plans
@@ -42,8 +45,8 @@ return [
     'plans' => [
         'basic' => [
             'name' => 'basic',
+            'description' => 'Basic plan',
             'price' => 1000,
         ],
     ],
-
 ];

@@ -21,7 +21,13 @@ trait ManagesSubscriptions
 
     public function newSubscription(string $plan): Checkout
     {
-        $checkout = Pay::newSubscription($this, 'default', $plan);
+        $plan = config('cashier.plans.'.$plan);
+
+        if (! $plan) {
+            throw new \Exception('Plan "'.$plan.'" not found in config/cashier.php');
+        }
+
+        $checkout = Pay::newSubscription($plan);
 
         $this->subscriptions()->create([
             'plan' => $plan,

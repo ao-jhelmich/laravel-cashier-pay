@@ -2,6 +2,7 @@
 
 namespace Paynl\LaravelCashier;
 
+use Paynl\LaravelCashier\ValueObjects\Checkout;
 use PayNL\Sdk\Config\Config;
 use PayNL\Sdk\Model\Request\OrderCreateRequest;
 use PayNL\Sdk\Request\RequestData;
@@ -31,19 +32,8 @@ class Pay
         return $request->setConfig($this->config())->start();
     }
 
-    public function orderCreate(string $returnUrl, string $exchangeUrl): OrderCreateRequest
+    public function orderCreate(): OrderCreateRequest
     {
-        $request = new OrderCreateRequest;
-
-        $serviceId = config('cashier.service_id');
-        if (blank($serviceId)) {
-            throw new \InvalidArgumentException('Pay service ID is not configured (cashier.service_id).');
-        }
-
-        $request->setServiceId((string) $serviceId);
-
-        $request->setReturnurl($returnUrl);
-        $request->setExchangeUrl($exchangeUrl);
 
         return $request;
     }
@@ -95,5 +85,33 @@ class Pay
             'username' => $serviceId,
             'password' => $password,
         ];
+    }
+
+    public function newSubscription(string $plan)
+    {
+        $plan = config('cashier.plans.'.$plan);
+
+        if (! $plan) {
+            throw new \Exception('Plan "'.$plan.'" not found in config/cashier.php');
+        }
+
+        $serviceId = config('cashier.service_id');
+
+        if (blank($serviceId)) {
+            throw new \InvalidArgumentException('Pay service ID is not configured (cashier.service_id).');
+        }
+
+        $request = (new OrderCreateRequest)->setServiceId((string) $serviceId)
+            ->setReturnurl(config('cashier.return_url'))
+            ->setExchangeUrl(config('cashier.exchange_url'))
+            ->setAmount($plan['price'])
+            ->setDescription($plan['name'])
+            ->setCurrency('EUR');
+
+        $payOrder = $this->request($request);
+
+        return new Checkout(
+            redirectUrl: (string) $payOrder->getPaymentUrl(),
+        );
     }
 }
